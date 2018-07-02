@@ -95,6 +95,12 @@ public:
     static const std::string RUNNING_WITH_SLAM;  ///< Stereo INS and SLAM are running.
   };
 
+  struct ReturnCode
+  {
+    int value; ///< suceess >= 0, failure < 0
+    std::string message;
+  };
+
   /// Thrown if the current_state response of the dynamics service does not correspond to those
   /// in the State struct
   class invalid_state : public std::runtime_error
@@ -119,7 +125,7 @@ public:
    * Creates a local instance of rc_visard's remote pose interface
    *
    * @param rcVisardIP rc_visard's inet address as string, e.g "192.168.0.12"
-   * @param requestsTimeout timeout in [ms] for doing REST-API calls
+   * @param requestsTimeout timeout in [ms] for doing REST-API calls, which don't have an explicit timeout parameter
    */
   static Ptr create(const std::string& rcVisardIP, unsigned int requestsTimeout = 5000);
 
@@ -178,6 +184,27 @@ public:
    * @throw invalid_state if the entered state does not match the known states in State
    */
   std::string resetSlam();
+
+  /**
+   * Saves the SLAM map on the sensor.
+   * @param timeout_ms timeout in ms for the call (default 0: no timeout)
+   * @return return code indicating success and string message
+   */
+  ReturnCode saveSlamMap(unsigned int timeout_ms = 0);
+
+  /**
+   * Loads the SLAM map on the sensor.
+   * @param timeout_ms timeout in ms for the call (default 0: no timeout)
+   * @return return code indicating success and string message
+   */
+  ReturnCode loadSlamMap(unsigned int timeout_ms = 0);
+
+  /**
+   * Removes the SLAM map on the sensor.
+   * @param timeout_ms timeout in ms for the call (default 0: no timeout)
+   * @return return code indicating success and string message
+   */
+  ReturnCode removeSlamMap(unsigned int timeout_ms = 0);
 
   /**
    * Returns a list all available streams on rc_visard
@@ -243,7 +270,8 @@ public:
    * very end)
    */
   roboception::msgs::Trajectory getSlamTrajectory(const TrajectoryTime& start = TrajectoryTime::RelativeToStart(),
-                                                  const TrajectoryTime& end = TrajectoryTime::RelativeToEnd());
+                                                  const TrajectoryTime& end = TrajectoryTime::RelativeToEnd(),
+                                                  unsigned int timeout_ms = 0);
 
   /**
    * Convenience method that automatically
@@ -278,7 +306,7 @@ protected:
   void checkStreamTypeAvailable(const std::string& stream);
   /// Common functionality for start(), startSlam(), stop(), ...
   std::string callDynamicsService(std::string serviceName);
-  std::string callSlamService(std::string serviceName);
+  ReturnCode callSlamService(std::string serviceName, unsigned int timeout_ms = 0); ///< call slam services which have a return code with value and message
 
   std::string _visardAddrs;
   std::map<std::string, std::list<std::string>> _reqStreams;
