@@ -1,3 +1,26 @@
+## rc_dynamics_api (kinetic) - 0.7.0-0
+
+The packages in the `rc_dynamics_api` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release --ros-distro kinetic rc_dynamics_api` on `Mon, 02 Jul 2018 16:44:26 -0000`
+
+The `rc_dynamics_api` package was released.
+
+Version of package(s) in repository `rc_dynamics_api`:
+
+- upstream repository: https://github.com/roboception/rc_dynamics_api.git
+- release repository: https://github.com/roboception-gbp/rc_dynamics_api-release.git
+- rosdistro version: `0.6.0-0`
+- old version: `0.6.0-0`
+- new version: `0.7.0-0`
+
+Versions of tools used:
+
+- bloom version: `0.6.6`
+- catkin_pkg version: `0.4.3`
+- rosdep version: `0.12.1`
+- rosdistro version: `0.6.8`
+- vcstools version: `0.1.40`
+
+
 ## rc_dynamics_api (indigo) - 0.7.0-0
 
 The packages in the `rc_dynamics_api` repository were released into the `indigo` distro by running `/usr/bin/bloom-release --ros-distro indigo rc_dynamics_api` on `Mon, 02 Jul 2018 16:33:40 -0000`
