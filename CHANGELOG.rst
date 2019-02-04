@@ -1,4 +1,9 @@
-0.7.0 (2018-04-02)
+0.7.1 (2019-02-04)
+------------------
+
+* update cmake files for version and packaging
+
+0.7.0 (2018-07-02)
 ------------------
 
 * add saveSlamMap, loadSlamMap and removeSlamMap methods
