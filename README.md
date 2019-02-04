@@ -1,3 +1,26 @@
+## rc_dynamics_api (melodic) - 0.7.1-0
+
+The packages in the `rc_dynamics_api` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --ros-distro melodic rc_dynamics_api` on `Mon, 04 Feb 2019 16:19:39 -0000`
+
+The `rc_dynamics_api` package was released.
+
+Version of package(s) in repository `rc_dynamics_api`:
+
+- upstream repository: https://github.com/roboception/rc_dynamics_api.git
+- release repository: https://github.com/roboception-gbp/rc_dynamics_api-release.git
+- rosdistro version: `0.7.0-0`
+- old version: `0.7.0-0`
+- new version: `0.7.1-0`
+
+Versions of tools used:
+
+- bloom version: `0.7.2`
+- catkin_pkg version: `0.4.10`
+- rosdep version: `0.15.0`
+- rosdistro version: `0.7.2`
+- vcstools version: `0.1.40`
+
+
 ## rc_dynamics_api (melodic) - 0.7.0-0
 
 The packages in the `rc_dynamics_api` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --ros-distro melodic rc_dynamics_api` on `Mon, 02 Jul 2018 17:03:10 -0000`
