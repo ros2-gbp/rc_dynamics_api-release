@@ -82,7 +82,7 @@ public:
    * @param port port number for receiving data
    * @return
    */
-  static Ptr create(std::string ip_address, unsigned int& port)
+  static Ptr create(const std::string& ip_address, unsigned int& port)
   {
     return Ptr(new DataReceiver(ip_address, port));
   }
@@ -94,6 +94,20 @@ public:
 #else
     close(_sockfd);
 #endif
+  }
+
+  /**
+   * Returns Ip address for which the receiver was created
+   */
+  std::string getIpAddress() const {
+    return ip_;
+  }
+
+  /**
+   * Returns port  for which the receiver was created
+   */
+  unsigned int getPort() const {
+    return port_;
   }
 
   /**
@@ -172,16 +186,16 @@ public:
 #endif
 
     // parse msgs as probobuf
-    auto pbMsg = std::shared_ptr<PbMsgType>(new PbMsgType());
-    pbMsg->ParseFromArray(_buffer, msg_size);
-    return pbMsg;
+    auto pb_msg = std::shared_ptr<PbMsgType>(new PbMsgType());
+    pb_msg->ParseFromArray(_buffer, msg_size);
+    return pb_msg;
   }
 
   /**
    * Receives the next message from data stream (string-parameter version)
    *
    * This method blocks until the next message is available and returns it -
-   * de-serialized as specified by the pbMsgType parameter - as a pb::Message
+   * de-serialized as specified by the pb_msg_type parameter - as a pb::Message
    * base class pointer, or until it runs into user-specified timeout (see
    * setTimeout(...)).
    *
@@ -191,22 +205,22 @@ public:
    *
    * @return the next rc_dynamics data stream message as a pb::Message base class pointer, or NULL if timeout
    */
-  virtual std::shared_ptr<::google::protobuf::Message> receive(const std::string& pbMsgType)
+  virtual std::shared_ptr<::google::protobuf::Message> receive(const std::string& pb_msg_type)
   {
-    auto found = _recv_func_map.find(pbMsgType);
+    auto found = _recv_func_map.find(pb_msg_type);
     if (found == _recv_func_map.end())
     {
       std::stringstream msg;
-      msg << "Unsupported protobuf message type '" << pbMsgType << "'. Only the following types are supported: ";
+      msg << "Unsupported protobuf message type '" << pb_msg_type << "'. Only the following types are supported: ";
       for (auto const& p : _recv_func_map)
         msg << p.first << " ";
       throw std::invalid_argument(msg.str());
     }
-    return _recv_func_map[pbMsgType]();
+    return _recv_func_map[pb_msg_type]();
   }
 
 protected:
-  DataReceiver(std::string ip_address, unsigned int& port)
+  DataReceiver(const std::string& ip_address, unsigned int& port) : ip_(ip_address), port_(port)
   {
     // check if given string is a valid IP address
     if (!rc::isValidIPAddress(ip_address))
@@ -255,7 +269,7 @@ protected:
 
         throw SocketException("Error while getting socket name!", errno);
       }
-      port = ntohs(myaddr.sin_port);
+      port_ = port = ntohs(myaddr.sin_port);
     }
 
     // register all known protobuf message types
@@ -277,6 +291,9 @@ protected:
 
   typedef std::map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> map_type;
   map_type _recv_func_map;
+
+  std::string ip_;
+  unsigned int port_;
 };
 }
 }
