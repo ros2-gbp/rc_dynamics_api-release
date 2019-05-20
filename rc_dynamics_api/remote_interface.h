@@ -93,6 +93,7 @@ public:
     static const std::string WAITING_FOR_SLAM;   ///< Stereo INS is running, waiting for SLAM data, will proceed to
                                                  ///RUNNING_WITH_SLAM
     static const std::string RUNNING_WITH_SLAM;  ///< Stereo INS and SLAM are running.
+    static const std::string UNKNOWN;            ///< State of component is unknown, e.g. not yet reported
   };
 
   struct ReturnCode
@@ -103,20 +104,47 @@ public:
 
   /// Thrown if the current_state response of the dynamics service does not correspond to those
   /// in the State struct
-  class invalid_state : public std::runtime_error
+  class InvalidState : public std::runtime_error
   {
   public:
-    explicit invalid_state(std::string encountered_state)
+    explicit InvalidState(std::string encountered_state)
       : runtime_error("Invalid state encountered: " + encountered_state)
     {
     }
   };
 
   /// Thrown if a service call is not accepted
-  class not_accepted : public std::runtime_error
+  class NotAccepted : public std::runtime_error
   {
   public:
-    explicit not_accepted(std::string serviceName) : runtime_error("Service call not accepted: " + serviceName)
+    explicit NotAccepted(std::string service_name) : runtime_error("Service call not accepted: " + service_name)
+    {
+    }
+  };
+
+  /// Thrown if rc_dynamics is requested to receive dynamics data but component is not running
+  class DynamicsNotRunning : public std::runtime_error
+  {
+  public:
+    explicit DynamicsNotRunning(std::string state) : runtime_error("No data received: rc_dynamics is not running but in state: " + state)
+    {
+    }
+  };
+
+  /// Thrown if too many streams are running already on rc_visard
+  class TooManyStreamDestinations : public std::runtime_error
+  {
+  public:
+    explicit TooManyStreamDestinations(std::string msg) : runtime_error(msg)
+    {
+    }
+  };
+
+  /// Thrown if a REST API call is rejected because of too many requests
+  class TooManyRequests : public std::runtime_error
+  {
+  public:
+    explicit TooManyRequests(std::string url) : runtime_error("rc_visard returned http error code 429 (too many requests): " + url)
     {
     }
   };
@@ -124,33 +152,57 @@ public:
   /**
    * Creates a local instance of rc_visard's remote pose interface
    *
-   * @param rcVisardIP rc_visard's inet address as string, e.g "192.168.0.12"
-   * @param requestsTimeout timeout in [ms] for doing REST-API calls, which don't have an explicit timeout parameter
+   * @param rc_visard_ip rc_visard's inet address as string, e.g "192.168.0.12"
+   * @param requests_timeout timeout in [ms] for doing REST-API calls, which don't have an explicit timeout parameter
    */
-  static Ptr create(const std::string& rcVisardIP, unsigned int requestsTimeout = 5000);
+  static Ptr create(const std::string& rc_visard_ip, unsigned int requests_timeout = 5000);
 
   virtual ~RemoteInterface();
+
+  /**
+   * Connects with rc_visard and checks the system state of the rc_visard device
+   * @return true, if system is ready, false otherwise
+   */
+  bool checkSystemReady();
+
+  /**
+   * Returns the current state of rc_dynamics module
+   * @return the current state.
+   */
+  std::string getDynamicsState();
+
+  /**
+   * Returns the current state of rc_slam module
+   * @return the current state.
+   */
+  std::string getSlamState();
+
+  /**
+   * Returns the current state of rc_stereo_ins module
+   * @return the current state.
+   */
+  std::string getStereoInsState();
 
   /**
    * Sets rc_dynamics module to running state.
    * Only start the Stereo INS. To start SLAM use startSlam().
    * To restart use the restart() method.
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string start();
   /**
    * Sets rc_dynamics module to running state.
    * Also starts up the Stereo INS, if not already running.
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string startSlam();
   /**
    * Restarts the rc_dynamics module to Stereo INS only mode.
    * Equivalent to stop() and start()
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string restart();
 
@@ -158,14 +210,14 @@ public:
    * Restarts the rc_dynamics module to SLAM mode.
    * Equivalent to stop() and startSlam()
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string restartSlam();
 
   /**
    * Stops rc_dynamics module. If SLAM is running it will be stopped too.
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string stop();
 
@@ -173,7 +225,7 @@ public:
    * Stops only the SLAM module (via the rc_dynamics module).
    * The Stereo INS will keep running.
    * @return the entered state. Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string stopSlam();
 
@@ -181,7 +233,7 @@ public:
    * Resets the SLAM module
    * The Stereo INS will keep running, if it is.
    * @return the entered state (of the SLAM module). Note that this can be an intermediate state.
-   * @throw invalid_state if the entered state does not match the known states in State
+   * @throw InvalidState if the entered state does not match the known states in State
    */
   std::string resetSlam();
 
@@ -252,11 +304,13 @@ public:
   void deleteDestinationFromStream(const std::string& stream, const std::string& destination);
 
   /**
-   * Deletes all destinations from a stream.
+   * Deletes given destinations from a stream, i.e. request rc_visard to stop
+   * streaming data of the specified type to the given destinations.
    *
    * @param stream stream type, e.g. "pose", "pose_rt" or "dynamics"
+   * @param destinations list string-represented destination of the data stream, e.g. "192.168.0.1:30000"
    */
-  void deleteAllDestinationsFromStream(const std::string& stream);
+  void deleteDestinationsFromStream(const std::string& stream, const std::list<std::string>& destinations);
 
   /**
    * Returns the Slam trajectory from the sensor.
@@ -290,30 +344,33 @@ public:
    * Similar, if port number is unspecified (or 0) it will be assigned
    * arbitrarily as available by network interface layer.
    *
-   * @param destInterface empty or one of this hosts network interfaces, e.g. "eth0"
-   * @param destPort 0 or this hosts port number
+   * @param dest_interface empty or one of this hosts network interfaces, e.g. "eth0"
+   * @param dest_port 0 or this hosts port number
    * @return true, if stream could be initialized successfully
    */
-  DataReceiver::Ptr createReceiverForStream(const std::string& stream, const std::string& destInterface = "",
-                                            unsigned int destPort = 0);
+  DataReceiver::Ptr createReceiverForStream(const std::string& stream, const std::string& dest_interface = "",
+                                            unsigned int dest_port = 0);
 
 protected:
-  static std::map<std::string, RemoteInterface::Ptr> _remoteInterfaces;
+  static std::map<std::string, RemoteInterface::Ptr> remote_interfaces_;
 
-  RemoteInterface(const std::string& rcVisardIP, unsigned int requestsTimeout = 5000);
+  RemoteInterface(const std::string& rc_visard_ip, unsigned int requests_timeout = 5000);
 
   void cleanUpRequestedStreams();
   void checkStreamTypeAvailable(const std::string& stream);
   /// Common functionality for start(), startSlam(), stop(), ...
-  std::string callDynamicsService(std::string serviceName);
-  ReturnCode callSlamService(std::string serviceName, unsigned int timeout_ms = 0); ///< call slam services which have a return code with value and message
+  std::string callDynamicsService(std::string service_name);
+  ReturnCode callSlamService(std::string service_name, unsigned int timeout_ms = 0); ///< call slam services which have a return code with value and message
+  std::string getState(const std::string& node);
 
-  std::string _visardAddrs;
-  std::map<std::string, std::list<std::string>> _reqStreams;
-  std::list<std::string> _availStreams;
-  std::map<std::string, std::string> _protobufMap;
-  std::string _baseUrl;
-  int _timeoutCurl;
+  std::string visard_addrs_;
+  bool initialized_;     ///< indicates if remote_interface was initialized properly at least once, see checkSystemReady()
+  float visard_version_; ///< rc_visard's firmware version as double, i.e. major.minor, e.g. 1.6
+  std::map<std::string, std::list<std::string>> req_streams_;
+  std::list<std::string> avail_streams_;
+  std::map<std::string, std::string> protobuf_map_;
+  std::string base_url_;
+  int timeout_curl_;
 };
 }
 }
