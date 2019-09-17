@@ -88,6 +88,7 @@ public:
     static const std::string IDLE;                      ///< Not yet started or stopped
     static const std::string RUNNING;                   ///< Stereo INS is running
     static const std::string FATAL;                     ///< An error has occured. May be resolvable by stopping.
+    static const std::string STOPPING;                  ///< Intermediate state while transitioning to IDLE (e.g. from RUNNING)
     static const std::string WAITING_FOR_INS;           ///< Waiting for IMU data, will proceed to RUNNING
     static const std::string WAITING_FOR_INS_AND_SLAM;  ///< Waiting for IMU data, will proceed to WAITING_FOR_SLAM
     static const std::string WAITING_FOR_SLAM;   ///< Stereo INS is running, waiting for SLAM data, will proceed to
@@ -145,6 +146,15 @@ public:
   {
   public:
     explicit TooManyRequests(std::string url) : runtime_error("rc_visard returned http error code 429 (too many requests): " + url)
+    {
+    }
+  };
+
+  /// Thrown if a REST API call is rejected because of 404; i.e. URL not found
+  class NotAvailable : public std::runtime_error
+  {
+  public:
+    explicit NotAvailable(std::string url) : runtime_error("Requested resource is not available on rc_visard (returned http error code 404): " + url)
     {
     }
   };
@@ -326,6 +336,15 @@ public:
   roboception::msgs::Trajectory getSlamTrajectory(const TrajectoryTime& start = TrajectoryTime::RelativeToStart(),
                                                   const TrajectoryTime& end = TrajectoryTime::RelativeToEnd(),
                                                   unsigned int timeout_ms = 0);
+
+  /**
+   * Returns the transformation from camera to IMU coordinate frame.
+   *
+   * This is equivalent to the cam2imu_transform in the Dynamics message.
+   *
+   * @param timeout_ms timeout in ms for the call (default 0: no timeout)
+   */
+  roboception::msgs::Frame getCam2ImuTransform(unsigned int timeout_ms = 0);
 
   /**
    * Convenience method that automatically
