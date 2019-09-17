@@ -1,3 +1,13 @@
+0.10.0 (2019-09-11)
+------------------
+
+* improve exception handling using new NotAvailable
+
+0.9.0 (2019-09-11)
+------------------
+
+* add getCam2ImuTransform
+
 0.8.0 (2019-05-08)
 ------------------
 
