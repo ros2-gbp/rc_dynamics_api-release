@@ -85,11 +85,7 @@ if (NOT USE_SYSTEM_CURL OR NOT CURL_FOUND)
   set(BUILD_TESTING OFF CACHE BOOL "Build testing tree")
 endif ()
 
-add_subdirectory(cpr)
-
-# Submodule: JSON
-
-set(JSON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/json/src PARENT_SCOPE)
+add_subdirectory(cpr EXCLUDE_FROM_ALL)
 
 # Submodule: Protobuf
 
