@@ -1,3 +1,26 @@
+## rc_dynamics_api (dashing) - 0.10.2-1
+
+The packages in the `rc_dynamics_api` repository were released into the `dashing` distro by running `/usr/bin/bloom-release --ros-distro dashing --new-track rc_dynamics_api` on `Mon, 06 Apr 2020 09:55:16 -0000`
+
+The `rc_dynamics_api` package was released.
+
+Version of package(s) in repository `rc_dynamics_api`:
+
+- upstream repository: https://github.com/roboception/rc_dynamics_api.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.10.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.3`
+- catkin_pkg version: `0.4.16`
+- rosdep version: `0.18.0`
+- rosdistro version: `0.8.0`
+- vcstools version: `0.1.42`
+
+
 ## rc_dynamics_api (noetic) - 0.10.1-1
 
 The packages in the `rc_dynamics_api` repository were released into the `noetic` distro by running `/usr/bin/bloom-release --ros-distro noetic rc_dynamics_api` on `Sat, 04 Apr 2020 13:31:57 -0000`
