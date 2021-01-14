@@ -1,3 +1,26 @@
+## rc_dynamics_api (rolling) - 0.10.3-1
+
+The packages in the `rc_dynamics_api` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --ros-distro rolling rc_dynamics_api` on `Thu, 14 Jan 2021 11:11:22 -0000`
+
+The `rc_dynamics_api` package was released.
+
+Version of package(s) in repository `rc_dynamics_api`:
+
+- upstream repository: https://github.com/roboception/rc_dynamics_api.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.10.3-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.0`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.20.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## rc_dynamics_api (foxy) - 0.10.2-1
 
 The packages in the `rc_dynamics_api` repository were released into the `foxy` distro by running `/usr/bin/bloom-release --ros-distro foxy --new-track rc_dynamics_api` on `Wed, 23 Sep 2020 12:28:42 -0000`
