@@ -1,1 +1,1 @@
-{"trim": "", "base": "0cc1f2b", "trimbase": "", "parent": "debian/rolling/rc_dynamics_api", "previous": "cc4be39"}
+{"base": "956c0b3", "parent": "debian/galactic/rc_dynamics_api", "previous": "a6fe36f", "trim": "", "trimbase": ""}
