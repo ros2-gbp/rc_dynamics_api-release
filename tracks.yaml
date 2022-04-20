@@ -127,8 +127,7 @@ tracks:
     ros_distro: humble
     vcs_type: git
     vcs_uri: https://github.com/roboception/rc_dynamics_api.git
-    version: 0.10.3
-    version_saved: :{auto}
+    version: :{auto}
   indigo:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
