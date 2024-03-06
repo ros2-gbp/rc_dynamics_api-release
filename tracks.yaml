@@ -122,7 +122,7 @@ tracks:
     name: rc_dynamics_api
     patches: null
     release_inc: '3'
-    release_repo_url: git@github.com:roboception/rc_dynamics_api-release.git
+    release_repo_url: null
     release_tag: v:{version}
     ros_distro: humble
     vcs_type: git
@@ -301,7 +301,7 @@ tracks:
     name: rc_dynamics_api
     patches: null
     release_inc: '3'
-    release_repo_url: git@github.com:roboception/rc_dynamics_api-release.git
+    release_repo_url: null
     release_tag: v:{version}
     ros_distro: rolling
     vcs_type: git
