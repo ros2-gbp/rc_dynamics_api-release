@@ -302,11 +302,11 @@ tracks:
     - git-bloom-generate -y rosdynrpm --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --require-os fedora rhel
     devel_branch: master
-    last_release: v0.10.5
-    last_version: 0.10.5
+    last_release: v0.10.7
+    last_version: 0.10.7
     name: rc_dynamics_api
     patches: null
-    release_inc: '3'
+    release_inc: '1'
     release_repo_url: null
     release_tag: v:{version}
     ros_distro: lyrical
