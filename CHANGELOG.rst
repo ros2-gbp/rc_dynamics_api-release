@@ -1,3 +1,14 @@
+0.10.7 (2026-10-12)
+-------------------
+
+* fix build on resolute with cmake >= 4.0
+* [ci] build for resolute
+
+0.10.6 (2026-06-16)
+-------------------
+
+* [ci] remove focal, add noble
+
 0.10.5 (2024-03-14)
 -------------------
 
